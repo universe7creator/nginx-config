@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nginx Config Generator Pro | Professional Server Configuration</title>
+  <meta name="description" content="Generate production-ready Nginx configurations with security best practices, SSL templates, and performance optimizations. Save hours of configuration work.">
+  <meta property="og:title" content="Nginx Config Generator Pro">
+  <meta property="og:description" content="Professional Nginx configuration generator with security best practices">
+  <meta property="og:type" content="website">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg-primary: #0a0a0a;
+      --bg-secondary: #111111;
+      --bg-card: #1a1a1a;
+      --text-primary: #ffffff;
+      --text-secondary: #a0a0a0;
+      --accent: #00d4aa;
+      --accent-glow: rgba(0, 212, 170, 0.3);
+      --border: #2a2a2a;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 80px 20px;
+      background: radial-gradient(ellipse at top, rgba(0, 212, 170, 0.15) 0%, transparent 50%),
+                  radial-gradient(ellipse at bottom, rgba(99, 102, 241, 0.1) 0%, transparent 50%);
+      position: relative;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23222' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      opacity: 0.5;
+      pointer-events: none;
+    }
+    .hero-content { position: relative; z-index: 1; max-width: 900px; }
+    .badge {
+      display: inline-block;
+      padding: 8px 20px;
+      background: linear-gradient(135deg, rgba(0, 212, 170, 0.2), rgba(99, 102, 241, 0.2));
+      border: 1px solid var(--accent);
+      border-radius: 50px;
+      font-size: 0.85rem;
+      color: var(--accent);
+      margin-bottom: 30px;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 0 var(--accent-glow); }
+      50% { box-shadow: 0 0 20px 5px var(--accent-glow); }
+    }
+    h1 {
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 25px;
+      background: linear-gradient(135deg, #fff 0%, #a5b4fc 50%, #00d4aa 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .subtitle {
+      font-size: clamp(1.1rem, 2.5vw, 1.35rem);
+      color: var(--text-secondary);
+      max-width: 700px;
+      margin: 0 auto 40px;
+    }
+    .cta-group {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 60px;
+    }
+    .cta-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: linear-gradient(135deg, var(--accent), #00a884);
+      color: #000;
+      padding: 18px 40px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 1.1rem;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 30px var(--accent-glow);
+    }
+    .cta-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 40px var(--accent-glow);
+    }
+    .cta-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: transparent;
+      color: var(--text-primary);
+      padding: 18px 40px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1.1rem;
+      border: 1px solid var(--border);
+      transition: all 0.3s ease;
+    }
+    .cta-secondary:hover {
+      background: var(--bg-card);
+      border-color: var(--accent);
+    }
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 30px;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 100px 20px;
+    }
+    .feature-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 40px;
+      transition: all 0.3s ease;
+    }
+    .feature-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-5px);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+    .feature-icon {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, rgba(0, 212, 170, 0.2), rgba(99, 102, 241, 0.2));
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      margin-bottom: 25px;
+    }
+    .feature-card h3 {
+      font-size: 1.3rem;
+      margin-bottom: 15px;
+      color: var(--text-primary);
+    }
+    .feature-card p {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+    }
+    .demo-section {
+      padding: 100px 20px;
+      background: var(--bg-secondary);
+    }
+    .demo-container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    .demo-section h2 {
+      text-align: center;
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+    }
+    .demo-section .section-desc {
+      text-align: center;
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin: 0 auto 50px;
+    }
+    .demo-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 40px;
+    }
+    .config-output {
+      background: #0d1117;
+      border-radius: 12px;
+      padding: 25px;
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      font-size: 0.85rem;
+      line-height: 1.6;
+      color: #e6edf3;
+      overflow-x: auto;
+      border: 1px solid #30363d;
+    }
+    .config-output .comment { color: #8b949e; }
+    .config-output .directive { color: #7ee787; }
+    .config-output .value { color: #79c0ff; }
+    .pricing {
+      padding: 100px 20px;
+      text-align: center;
+    }
+    .pricing-card {
+      background: linear-gradient(135deg, var(--bg-card), var(--bg-secondary));
+      border: 1px solid var(--accent);
+      border-radius: 24px;
+      padding: 60px 40px;
+      max-width: 450px;
+      margin: 0 auto;
+      position: relative;
+    }
+    .pricing-card::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      background: linear-gradient(135deg, var(--accent), transparent, #6366f1);
+      border-radius: 24px;
+      z-index: -1;
+      opacity: 0.5;
+    }
+    .price {
+      font-size: 4rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #fff, var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin: 20px 0;
+    }
+    .price-note {
+      color: var(--text-secondary);
+      margin-bottom: 30px;
+    }
+    .faq {
+      padding: 100px 20px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .faq h2 {
+      text-align: center;
+      font-size: 2.5rem;
+      margin-bottom: 50px;
+    }
+    .faq-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 25px 30px;
+      margin-bottom: 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .faq-item:hover {
+      border-color: var(--accent);
+    }
+    .faq-item h4 {
+      font-size: 1.1rem;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .faq-item p {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      display: none;
+    }
+    .faq-item.active p {
+      display: block;
+      margin-top: 15px;
+    }
+    .footer {
+      padding: 60px 20px;
+      text-align: center;
+      border-top: 1px solid var(--border);
+      color: var(--text-secondary);
+    }
+    .footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    @media (max-width: 768px) {
+      .cta-group { flex-direction: column; align-items: center; }
+      .cta-primary, .cta-secondary { width: 100%; justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+  <section class="hero">
+    <div class="hero-content">
+      <div class="badge">✨ Production-Ready Configs</div>
+      <h1>Nginx Config Generator Pro</h1>
+      <p class="subtitle">Generate secure, optimized Nginx configurations in seconds. SSL templates, security headers, rate limiting, and performance tuning — all with one click.</p>
+      <div class="cta-group">
+        <a href="#pricing" class="cta-primary">
+          <span>Get Instant Access</span>
+          <span>→</span>
+        </a>
+        <a href="#demo" class="cta-secondary">See Demo</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="features">
+    <div class="feature-card">
+      <div class="feature-icon">🔒</div>
+      <h3>Security Best Practices</h3>
+      <p>Built-in security headers, SSL configuration, and protection against common vulnerabilities. Your configs are secure by default.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">⚡</div>
+      <h3>Performance Optimized</h3>
+      <p>Gzip compression, caching strategies, and connection pooling. Every config is tuned for maximum performance.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🚀</div>
+      <h3>Ready to Deploy</h3>
+      <p>Copy-paste ready configurations. No manual tweaking needed. Works with Let's Encrypt, Cloudflare, and any server.</p>
+    </div>
+  </section>
+
+  <section class="demo-section" id="demo">
+    <div class="demo-container">
+      <h2>See It In Action</h2>
+      <p class="section-desc">Generate production-grade Nginx configs with security, SSL, and performance optimizations included.</p>
+      <div class="demo-box">
+        <div class="config-output">
+<span class="comment"># Production Nginx Configuration</span>
+<span class="comment"># Auto-generated with security best practices</span>
+
+<span class="directive">server</span> {
+    <span class="directive">listen</span> <span class="value">443 ssl http2</span>;
+    <span class="directive">server_name</span> <span class="value">example.com</span>;
+
+    <span class="comment"># SSL Configuration</span>
+    <span class="directive">ssl_certificate</span> <span class="value">/etc/letsencrypt/live/example.com/fullchain.pem</span>;
+    <span class="directive">ssl_certificate_key</span> <span class="value">/etc/letsencrypt/live/example.com/privkey.pem</span>;
+    <span class="directive">ssl_protocols</span> <span class="value">TLSv1.2 TLSv1.3</span>;
+
+    <span class="comment"># Security Headers</span>
+    <span class="directive">add_header</span> <span class="value">X-Frame-Options</span> <span class="value">"SAMEORIGIN"</span>;
+    <span class="directive">add_header</span> <span class="value">X-Content-Type-Options</span> <span class="value">"nosniff"</span>;
+
+    <span class="comment"># Gzip Compression</span>
+    <span class="directive">gzip</span> <span class="value">on</span>;
+    <span class="directive">gzip_types</span> <span class="value">text/plain text/css application/json</span>;
+}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="pricing" id="pricing">
+    <div class="pricing-card">
+      <h2>Lifetime Access</h2>
+      <div class="price">$19</div>
+      <p class="price-note">One-time payment. Unlimited configs. Forever updates.</p>
+      <a href="#" class="cta-primary" id="buyBtn" style="width: 100%; justify-content: center;">Get Nginx Config Generator Pro</a>
+      <p style="margin-top: 20px; font-size: 0.85rem; color: var(--text-secondary);">✓ 30-day money-back guarantee</p>
+    </div>
+  </section>
+
+  <section class="faq">
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-item">
+      <h4>What types of configs can I generate? <span>+</span></h4>
+      <p>Reverse proxy, static site hosting, load balancing, SSL-enabled setups, API gateway configurations, and more. Each template includes security best practices.</p>
+    </div>
+    <div class="faq-item">
+      <h4>Do I need to know Nginx? <span>+</span></h4>
+      <p>No! The tool generates ready-to-use configurations. Just fill in your domain and choose your setup type. We handle the technical details.</p>
+    </div>
+    <div class="faq-item">
+      <h4>Is this a one-time purchase? <span>+</span></h4>
+      <p>Yes! Pay once, get lifetime access including all future updates and new templates we add.</p>
+    </div>
+    <div class="faq-item">
+      <h4>Can I use the configs commercially? <span>+</span></h4>
+      <p>Absolutely. Use generated configs for personal projects, client work, or enterprise deployments. No restrictions.</p>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <p>© 2025 Nginx Config Generator Pro. Built with 💚 for developers.</p>
+    <p style="margin-top: 10px;"><a href="#">Contact Support</a> • <a href="#">Privacy</a></p>
+  </footer>
+
+  <script>
+    const CHECKOUT_URL = window.__CHECKOUT_URL || null;
+    document.getElementById('buyBtn').addEventListener('click', (e) => {
+      e.preventDefault();
+      if (CHECKOUT_URL) window.open(CHECKOUT_URL, '_blank');
+      else alert('Store coming soon! Contact @OtonomUniverseCreator on Telegram.');
+    });
+
+    document.querySelectorAll('.faq-item').forEach(item => {
+      item.addEventListener('click', () => {
+        item.classList.toggle('active');
+        const span = item.querySelector('h4 span');
+        span.textContent = item.classList.contains('active') ? '−' : '+';
+      });
+    });
+  </script>
+</body>
+</html>
